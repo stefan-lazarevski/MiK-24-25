@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прогрес</title>
+    <head>
+        <!-- Other head content -->
+        <script src="script.js" defer></script>
+    </head>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-container {
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-value {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+
+        .badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .badge-item {
+            width: 100px;
+            height: 100px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid #ccc;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .badge-item.earned {
+            border-color: #4CAF50;
+            background-color: #e8f5e9;
+        }
+
+        .badge-icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .badge-name {
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .leaderboard-table th {
+            background-color: #f2f2f2;
+        }
+
+        .leaderboard-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .leaderboard-table tr.current-user {
+            background-color: #e8f5e9;
+            font-weight: bold;
+        }
+
+        .navigation {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 20px 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .points-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #4CAF50;
+            text-align: center;
+        }
+
+        .total-points {
+            text-align: center;
+        }
+
+        .refresh-button {
+            background-color: #2196F3;
+            margin-bottom: 20px;
+        }
+
+        .refresh-button:hover {
+            background-color: #0b7dda;
+        }
+    </style>
+</head>
+<body>
+<header>
+  <div class="container">
+        <h1>Вашиот Прогрес</h1>
+    </div>
+</header>
+
+<div class="container">
+<!--    <div class="navigation">-->
+<!--        <button class="refresh-button" id="refresh-button">Освежи Податоци</button>-->
+<!--    </div>-->
+    <div class="navigation">
+        <button id="home-button">Почетна</button>
+        <button id="index-button">Анализирај слика</button>
+    </div>
+
+    <div class="dashboard">
+        <div class="card total-points">
+            <h2>Вкупно Поени</h2>
+            <div class="points-value" id="total-points">-</div>
+        </div>
+
+        <div class="card">
+            <h2>Прогрес</h2>
+            <p>Напредок до следно ниво:</p>
+            <div class="progress-bar-container">
+                <div class="progress-value" id="level-progress"></div>
+            </div>
+            <p>Следна значка: <span id="next-badge">Чувар</span></p>
+            <p>Поени до следна значка: <span id="points-to-next">0</span></p>
+        </div>
+
+        <div class="card">
+            <h2>Значки</h2>
+            <div class="badges-container" id="badges-container">
+                <!-- Badges will be inserted dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Ранг Листа</h2>
+        <table class="leaderboard-table">
+            <thead>
+            <tr>
+                <th>Ранг</th>
+                <th>Име</th>
+                <th>Поени</th>
+            </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+            <!-- Leaderboard rows will be inserted dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+
+</div>
+
+<!-- Connect to your existing JS file -->
+<!--<script src="script.js"></script>-->
+
+<!-- Additional JS for progress page functionality -->
+<script>
+    function updateProgressDisplay() {
+        // Get points from localStorage directly
+        const points = parseInt(localStorage.getItem('userPoints') || '0');
+
+        // Update points display
+        const totalPointsElement = document.getElementById('total-points');
+        if (totalPointsElement) {
+            totalPointsElement.textContent = points;
+        }
+
+        // Define milestones directly here to avoid dependency on script.js
+        const milestones = [
+            {threshold: 10, badge: "Почетник"},
+            {threshold: 25, badge: "Истражувач"},
+            {threshold: 50, badge: "Чувар"},
+            {threshold: 100, badge: "Заштитник"},
+            {threshold: 200, badge: "Шампион"}
+        ];
+
+        // Find the next milestone
+        let nextMilestone = milestones[milestones.length - 1]; // Default to last milestone
+        for (const milestone of milestones) {
+            if (points < milestone.threshold) {
+                nextMilestone = milestone;
+                break;
+            }
+        }
+
+        // Calculate progress and points needed
+        const pointsToNext = nextMilestone.threshold - points;
+        const progress = points < nextMilestone.threshold ?
+            (points / nextMilestone.threshold) * 100 : 100;
+
+        // Update UI elements
+        document.getElementById('level-progress').style.width = `${progress}%`;
+        document.getElementById('next-badge').textContent = nextMilestone.badge;
+        document.getElementById('points-to-next').textContent = pointsToNext;
+
+        // Update badges
+        updateBadgesDisplay();
+
+        // Update leaderboard
+        updateLeaderboardDisplay();
+    }
+
+    // Function to update badges display
+    function updateBadgesDisplay() {
+        const badgesContainer = document.getElementById('badges-container');
+        badgesContainer.innerHTML = ''; // Clear existing badges
+
+        // Get badges from script.js function if available
+        let badges = [];
+        if (window.getBadgesForProgressPage) {
+            badges = window.getBadgesForProgressPage();
+        } else {
+            // Create default badges if the function isn't available
+            const earnedBadges = JSON.parse(localStorage.getItem('earnedBadges') || '[]');
+            badges = [
+                { name: "Почетник", icon: "🔰", earned: earnedBadges.includes("Почетник") },
+                { name: "Истражувач", icon: "🔍", earned: earnedBadges.includes("Истражувач") },
+                { name: "Чувар", icon: "🛡️", earned: earnedBadges.includes("Чувар") },
+                { name: "Заштитник", icon: "⚔️", earned: earnedBadges.includes("Заштитник") },
+                { name: "Шампион", icon: "🏆", earned: earnedBadges.includes("Шампион") }
+            ];
+        }
+
+        badges.forEach(badge => {
+            const badgeElement = document.createElement('div');
+            badgeElement.className = 'badge-item' + (badge.earned ? ' earned' : '');
+            badgeElement.innerHTML = `
+                    <div class="badge-icon">${badge.icon}</div>
+                    <div class="badge-name">${badge.name}</div>
+                `;
+            badgesContainer.appendChild(badgeElement);
+        });
+    }
+
+    // Function to update leaderboard display
+    function updateLeaderboardDisplay() {
+        const leaderboardBody = document.getElementById('leaderboard-body');
+        leaderboardBody.innerHTML = ''; // Clear existing rows
+
+        // Get leaderboard from script.js function if available
+        let leaderboard = [];
+        if (window.getLeaderboard) {
+            leaderboard = window.getLeaderboard();
+        } else {
+            // Create default leaderboard if the function isn't available
+            const points = parseInt(localStorage.getItem('userPoints') || '0');
+            const username = localStorage.getItem('username') || 'You';
+
+            leaderboard = [
+                { name: "TopPlayer", points: Math.max(points + 50, 100) },
+                { name: "Achiever99", points: Math.max(points + 25, 75) },
+                { name: username, points: points },
+                { name: "GameMaster", points: Math.max(points - 25, 20) },
+                { name: "LearningQueen", points: Math.max(points - 50, 10) }
+            ];
+
+            // Sort by points
+            leaderboard.sort((a, b) => b.points - a.points);
+        }
+
+        // Display leaderboard
+        const username = localStorage.getItem('username') || 'You';
+        leaderboard.forEach((entry, index) => {
+            const row = document.createElement('tr');
+
+            if (entry.name === username) {
+                row.className = 'current-user';
+            }
+
+            row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${entry.name}</td>
+                    <td>${entry.points}</td>
+                `;
+
+            leaderboardBody.appendChild(row);
+        });
+    }
+
+    // Event listeners for page initialization and buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the display
+        updateProgressDisplay();
+
+        // Navigation buttons
+        document.getElementById('home-button').addEventListener('click', function() {
+            window.location.href = 'home.html';
+        });
+
+        document.getElementById('index-button').addEventListener('click', function() {
+            window.location.href = 'index.html';
+        });
+
+        // // Refresh button
+        // document.getElementById('refresh-button').addEventListener('click', function() {
+        //     updateProgressDisplay();
+        // });
+    });
+</script>
+</body>
+</html>

@@ -9,6 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity@1.2.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+    <script src="script.js"></script>
 </head>
 <body>
 <div class="container">
@@ -35,6 +36,14 @@
             <div id="safetyResult"></div>
             <div id="contentDescription"></div>
             <div id="textAnalysisResult"></div>
+            <div id="pointsDisplay"><strong>Ваши поени:</strong> <span id="points">0</span></div>
+            <div id="badgeContainer">
+                <h3>Вашите значки:</h3>
+                <div id="badges"></div>
+                <div class="progress-bar-container">
+                    <div id="progressBar" class="progress-bar"></div>
+                </div>
+            </div>
         </div>
 
         <div class="info-box">
@@ -42,6 +51,8 @@
             <p>Оваа апликација ви помага да препознаете дали сликите се безбедни или содржат несоодветна содржина.</p>
             <p>Апликацијата исто така може да препознае и анализира текст во сликите за да открие малтретирање.</p>
             <p>Научете како да се заштитите од сајбер малтретирање и дезинформации!</p>
+            <h3>Интернет безбедносен совет</h3>
+            <p id="safetyTip">Користете силни лозинки и никогаш не споделувајте лични информации онлајн.</p>
         </div>
     </main>
 
@@ -50,7 +61,5 @@
         <p>226079, Стефан Лазаревски</p>
     </footer>
 </div>
-
-<script src="script.js"></script>
 </body>
 </html>

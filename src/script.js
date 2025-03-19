@@ -14,6 +14,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const safetyResult = document.getElementById('safetyResult');
     const contentDescription = document.getElementById('contentDescription');
     const textAnalysisResult = document.getElementById('textAnalysisResult');
+    const pointsDisplay = document.getElementById('points');
+    const progressBar = document.getElementById('progressBar');
+    const badgesContainer = document.getElementById('badges');
+
+    // Initialize points system
+    initPointsSystem();
+
+    // Progress button
+    const progressButton = document.createElement('button');
+    progressButton.id = 'progressButton';
+    progressButton.className = 'progress-button';
+    progressButton.textContent = 'View Progress';
+    progressButton.onclick = () => window.location.href = 'progress.html';
+    document.querySelector('.container').appendChild(progressButton);
 
     // Unsafe content categories to check
     const unsafeCategories = {
@@ -163,7 +177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Extract text from image using OCR
             console.log("Екстрахирање текст од слика...");
-            const { data } = await tesseractWorker.recognize(imagePreview);
+            const {data} = await tesseractWorker.recognize(imagePreview);
             const extractedText = data.text.trim();
             console.log("Екстрахиран текст:", extractedText);
 
@@ -245,8 +259,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             let safetyStatusMessage = '';
             if (isSafe) {
                 safetyStatusMessage = '<p class="text-safe" style="font-size: 18px; text-align: center; margin-top: 10px;">✓ Оваа слика е БЕЗБЕДНА</p>';
+                // Add points for safe image
+                updatePoints(5);
             } else {
                 safetyStatusMessage = '<p class="text-warning" style="font-size: 18px; text-align: center; margin-top: 10px;">⚠️ Оваа слика е НЕБЕЗБЕДНА</p>';
+                // Add encouraging message for unsafe image
+                safetyStatusMessage += '<p style="text-align: center;">Не се грижи, обиди се со друга слика! Ќе успееш следниот пат!</p>';
             }
 
             // Display the results
@@ -268,7 +286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to check text for toxicity
     async function checkTextToxicity(text) {
         if (!toxicityModel || !text || text.trim().length < 3) {
-            return { isToxic: false, categories: [] };
+            return {isToxic: false, categories: []};
         }
 
         try {
@@ -307,10 +325,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
 
-            return { isToxic, categories };
+            return {isToxic, categories};
         } catch (error) {
             console.error("Грешка при проверка на токсичност:", error);
-            return { isToxic: false, categories: [] };
+            return {isToxic: false, categories: []};
         }
     }
 
@@ -337,4 +355,295 @@ document.addEventListener('DOMContentLoaded', async () => {
             contentDescription.innerHTML += safetyStatusMessage;
         }
     }
+
+// Points system functions
+    function initPointsSystem() {
+        const userPoints = getUserPoints();
+        updatePointsDisplay(userPoints);
+
+        // Display earned badges
+        displayBadges();
+
+        // Add CSS for points system
+        const style = document.createElement('style');
+        style.textContent = `
+        #progressBar {
+            height: 20px;
+            width: 0%;
+            background-color: #4CAF50;
+            transition: width 0.3s ease-in-out;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        #badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .badge {
+            padding: 5px 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            display: inline-block;
+            font-weight: bold;
+            border: 2px solid #4CAF50;
+        }
+        
+        .progress-button {
+            background-color: #000000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 0px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+            width: 200px;
+            margin: 10px auto;
+        }
+
+        
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .celebrate {
+            animation: celebrate 0.5s ease-in-out;
+        }
+        
+        .badge-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 2000;
+        }
+        
+        .badge-message h2 {
+            margin-top: 0;
+        }
+        
+        .badge-message p {
+            margin-bottom: 0;
+        }
+    `;
+        document.head.appendChild(style);
+    }
+
+    function getUserPoints() {
+        return parseInt(localStorage.getItem('userPoints') || '0');
+    }
+
+    function updatePoints(points) {
+        const currentPoints = getUserPoints();
+        const newPoints = currentPoints + points;
+        localStorage.setItem('userPoints', newPoints.toString());
+
+        updatePointsDisplay(newPoints);
+
+        // Check if user reached a milestone
+        checkMilestone(currentPoints, newPoints);
+
+        // Update leaderboard
+        updateLeaderboard(newPoints);
+    }
+
+    function updatePointsDisplay(points) {
+        // Update the points display
+        if (pointsDisplay) {
+            pointsDisplay.textContent = points;
+        }
+
+        // Get the next milestone
+        const nextMilestone = getNextMilestone(points);
+        const progress = ((points % nextMilestone.threshold) / nextMilestone.threshold) * 100;
+
+        // Update progress bar
+        if (progressBar) {
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Update badges display
+        displayBadges();
+    }
+
+    function displayBadges() {
+        if (!badgesContainer) return;
+
+        const badges = getEarnedBadges();
+        badgesContainer.innerHTML = '';
+
+        if (badges.length === 0) {
+            badgesContainer.innerHTML = '<p>Немате освоено значки. Продолжете да поставувате безбедни слики!</p>';
+        } else {
+            badges.forEach(badge => {
+                const badgeElement = document.createElement('div');
+                badgeElement.className = 'badge';
+                badgeElement.textContent = badge;
+                badgesContainer.appendChild(badgeElement);
+            });
+        }
+    }
+
+    function getEarnedBadges() {
+        return JSON.parse(localStorage.getItem('earnedBadges') || '[]');
+    }
+
+    function getNextMilestone(points) {
+        const milestones = [
+            {threshold: 10, badge: "Почетник"},
+            {threshold: 25, badge: "Истражувач"},
+            {threshold: 50, badge: "Чувар"},
+            {threshold: 100, badge: "Заштитник"},
+            {threshold: 200, badge: "Шампион"}
+        ];
+
+        for (const milestone of milestones) {
+            if (points < milestone.threshold) {
+                return milestone;
+            }
+        }
+
+        // If all milestones achieved, return the last one
+        return milestones[milestones.length - 1];
+    }
+
+    function checkMilestone(oldPoints, newPoints) {
+        const milestones = [
+            {threshold: 10, badge: "Почетник"},
+            {threshold: 25, badge: "Истражувач"},
+            {threshold: 50, badge: "Чувар"},
+            {threshold: 100, badge: "Заштитник"},
+            {threshold: 200, badge: "Шампион"}
+        ];
+
+        for (const milestone of milestones) {
+            if (oldPoints < milestone.threshold && newPoints >= milestone.threshold) {
+                showBadgeEarned(milestone.badge);
+                saveBadge(milestone.badge);
+                break;
+            }
+        }
+    }
+
+    function showBadgeEarned(badge) {
+        const badgeMessage = document.createElement('div');
+        badgeMessage.className = 'badge-message';
+        badgeMessage.innerHTML = `
+        <h2>🎉 Нова значка! 🎉</h2>
+        <p>Честитки! Освоивте ја значката "${badge}"!</p>
+    `;
+        document.body.appendChild(badgeMessage);
+
+        // Add celebration animation to points display
+        if (pointsDisplay) {
+            pointsDisplay.classList.add('celebrate');
+        }
+
+        setTimeout(() => {
+            badgeMessage.remove();
+            if (pointsDisplay) {
+                pointsDisplay.classList.remove('celebrate');
+            }
+        }, 3000);
+    }
+
+    function saveBadge(badge) {
+        const badges = getEarnedBadges();
+        if (!badges.includes(badge)) {
+            badges.push(badge);
+            localStorage.setItem('earnedBadges', JSON.stringify(badges));
+        }
+    }
+
+// New functions for leaderboard and progress page integration
+    function updateLeaderboard(points) {
+        let leaderboard = getLeaderboard();
+        const username = localStorage.getItem('username') || 'You';
+
+        // Update or add the current user
+        const currentUser = leaderboard.find(user => user.name === username);
+        if (currentUser) {
+            currentUser.points = points;
+        } else {
+            leaderboard.push({name: username, points: points});
+        }
+
+        // Sort the leaderboard by points (highest first)
+        leaderboard.sort((a, b) => b.points - a.points);
+
+        // Save the updated leaderboard
+        localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+    }
+
+    function getLeaderboard() {
+        const storedLeaderboard = localStorage.getItem('leaderboard');
+
+        if (storedLeaderboard) {
+            return JSON.parse(storedLeaderboard);
+        } else {
+            // Create a default leaderboard with the current user
+            const points = getUserPoints();
+            const username = localStorage.getItem('username') || 'You';
+
+            const defaultLeaderboard = [
+                {name: "TopPlayer", points: Math.max(points + 50, 100)},
+                {name: "Achiever99", points: Math.max(points + 25, 75)},
+                {name: username, points: points},
+                {name: "GameMaster", points: Math.max(points - 25, 20)},
+                {name: "LearningQueen", points: Math.max(points - 50, 10)}
+            ];
+
+            return defaultLeaderboard;
+        }
+    }
+
+// Function to get formatted badge data for progress.html
+    function getBadgesForProgressPage() {
+        const earnedBadges = getEarnedBadges();
+        const milestones = [
+            {threshold: 10, badge: "Почетник", icon: "🔰"},
+            {threshold: 25, badge: "Истражувач", icon: "🔍"},
+            {threshold: 50, badge: "Чувар", icon: "🛡️"},
+            {threshold: 100, badge: "Заштитник", icon: "⚔️"},
+            {threshold: 200, badge: "Шампион", icon: "🏆"}
+        ];
+
+        return milestones.map(milestone => {
+            return {
+                name: milestone.badge,
+                icon: milestone.icon,
+                earned: earnedBadges.includes(milestone.badge)
+            };
+        });
+    }
+
+
+
+
+// Expose key functions and data for progress.html to access
+    window.getUserPoints = getUserPoints;
+    window.getEarnedBadges = getEarnedBadges;
+    window.getLeaderboard = getLeaderboard;
+    window.getBadgesForProgressPage = getBadgesForProgressPage;
+    window.getNextMilestone = getNextMilestone;
+
 });
