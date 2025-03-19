@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детектор на небезбедни слики</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.21.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity@1.2.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Детектор на небезбедни слики</h1>
+        <p>Апликација за препознавање на небезбедна содржина и малтретирање</p>
+    </header>
+
+    <main>
+        <div class="upload-area" id="uploadArea">
+            <p>Кликнете тука за да поставите слика или повлечете и пуштете слика</p>
+            <input type="file" id="imageInput" accept="image/*" hidden>
+        </div>
+
+        <img id="imagePreview" alt="Преглед на сликата">
+
+        <div id="loadingIndicator" class="loading">
+            <p>Се анализира сликата...</p>
+            <div class="spinner"></div>
+        </div>
+
+        <div id="resultContainer">
+            <h2>Резултати од анализата:</h2>
+            <div id="safetyResult"></div>
+            <div id="contentDescription"></div>
+            <div id="textAnalysisResult"></div>
+        </div>
+
+        <div class="info-box">
+            <h3>Што е ова?</h3>
+            <p>Оваа апликација ви помага да препознаете дали сликите се безбедни или содржат несоодветна содржина.</p>
+            <p>Апликацијата исто така може да препознае и анализира текст во сликите за да открие малтретирање.</p>
+            <p>Научете како да се заштитите од сајбер малтретирање и дезинформации!</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>Изработено за едукативни цели</p>
+        <p>226079, Стефан Лазаревски</p>
+    </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
