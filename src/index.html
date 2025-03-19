@@ -10,6 +10,28 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity@1.2.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
     <script src="script.js"></script>
+
+    <style>
+        .progress-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .progress-btn:hover {
+            background-color: #218838;
+            transform: scale(1.1);
+        }
+
+    </style>
 </head>
 <body>
 <div class="container">
@@ -55,7 +77,7 @@
             <p id="safetyTip">Користете силни лозинки и никогаш не споделувајте лични информации онлајн.</p>
         </div>
     </main>
-
+    <a href="progress.html" class="progress-btn">Види го напредокот</a>
     <footer>
         <p>Изработено за едукативни цели</p>
         <p>226079, Стефан Лазаревски</p>

@@ -21,13 +21,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize points system
     initPointsSystem();
 
-    // Progress button
-    const progressButton = document.createElement('button');
-    progressButton.id = 'progressButton';
-    progressButton.className = 'progress-button';
-    progressButton.textContent = 'View Progress';
-    progressButton.onclick = () => window.location.href = 'progress.html';
-    document.querySelector('.container').appendChild(progressButton);
+    // // Progress button
+    // const progressButton = document.createElement('button');
+    // progressButton.id = 'progressButton';
+    // progressButton.className = 'progress-button';
+    // progressButton.textContent = 'Ажурирај страната';
+    // progressButton.onclick = () => window.location.href = 'progress.html';
+    // document.querySelector('.container').appendChild(progressButton);
 
     // Unsafe content categories to check
     const unsafeCategories = {
