@@ -1,1 +1,1 @@
-Project for image recognition for the subject Media and Communications 2024-2025
+Project about image recognition for the subject Media and Communications @FCSE 2024/2025
